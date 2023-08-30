@@ -4,6 +4,17 @@ const high_confidence_keywords = ['#!/bin/bash', 'select *', 'select ?', 'select
 const symbol_keywords = ["=>", "==", "!=", ">", "<", ">=", "<=", "&&", "||"];
 const low_confidence_keywords = ['trace', 'error', 'exception', 'warn'];
 
+
+function sortSnippetResultFn(a: SnippetResult, b: SnippetResult) {
+    console.log('a', a);
+    if (a.hasCheckMark != b.hasCheckMark) {
+        return a.hasCheckMark ? 1 : -1;
+    }
+    console.log('now?')
+    const result = b.votes - a.votes;
+    return result === 0 ? b.code.length - a.code.length : result;
+}
+
 // Check whether the input should be considered as code input or random text
 export function isCodeValid(input: string): boolean {
     input = input.toLowerCase();

@@ -30,6 +30,15 @@ export default class ExtractorGithubGist extends ExtractorAbstract {
     };
 }
 
+function sortSnippetResultFn(a: SnippetResult, b: SnippetResult) {
+    console.log('a', a);
+    if (a.hasCheckMark != b.hasCheckMark) {
+        return a.hasCheckMark ? 1 : -1;
+    }
+
+    const result = b.votes - a.votes;
+    return result === 0 ? b.code.length - a.code.length : result;
+}
 /**
  * Github Gist use table to display code, which produces a bunch of unnecessary characters.
  * This feature is used to them clean up
