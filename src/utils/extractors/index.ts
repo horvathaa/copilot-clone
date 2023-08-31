@@ -1,9 +1,9 @@
-import GithubGistExtractor from "./ExtractorGithubGist";
-import StackoverflowExtractor from "./ExtractorStackOverflow";
+import GithubGistExtractor from './ExtractorGithubGist';
+import StackoverflowExtractor from './ExtractorStackOverflow';
 
 const SnippetExtractors = [
     new StackoverflowExtractor(),
-    new GithubGistExtractor()
+    new GithubGistExtractor(),
 ];
 
 export default SnippetExtractors;

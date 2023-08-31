@@ -1,16 +1,47 @@
-const keywords = ["def", "void", "int", "if", "else", "while", "return", "true", "false", "null", "this.", "print", "do", "", ""];
-const high_confidence_keywords = ['#!/bin/bash', 'select *', 'select ?', 'select count', '* from', '? from', 'where',
-    'order by', 'group by', 'left join', 'right join', 'inner join', 'outer join', 'exec '];
-const symbol_keywords = ["=>", "==", "!=", ">", "<", ">=", "<=", "&&", "||"];
-const low_confidence_keywords = ['trace', 'error', 'exception', 'warn'];
+import { SnippetResult } from './ExtractorAbstract';
 
+const keywords = [
+    'def',
+    'void',
+    'int',
+    'if',
+    'else',
+    'while',
+    'return',
+    'true',
+    'false',
+    'null',
+    'this.',
+    'print',
+    'do',
+    '',
+    '',
+];
+const high_confidence_keywords = [
+    '#!/bin/bash',
+    'select *',
+    'select ?',
+    'select count',
+    '* from',
+    '? from',
+    'where',
+    'order by',
+    'group by',
+    'left join',
+    'right join',
+    'inner join',
+    'outer join',
+    'exec ',
+];
+const symbol_keywords = ['=>', '==', '!=', '>', '<', '>=', '<=', '&&', '||'];
+const low_confidence_keywords = ['trace', 'error', 'exception', 'warn'];
 
 function sortSnippetResultFn(a: SnippetResult, b: SnippetResult) {
     console.log('a', a);
     if (a.hasCheckMark != b.hasCheckMark) {
         return a.hasCheckMark ? 1 : -1;
     }
-    console.log('now?')
+    console.log('now?');
     const result = b.votes - a.votes;
     return result === 0 ? b.code.length - a.code.length : result;
 }
@@ -31,9 +62,18 @@ export function isCodeValid(input: string): boolean {
     const openParen = input.split('(').length - 1;
     const closedParen = input.split(')').length - 1;
 
-    const bracketTotal = openAngle + closedAngle + openBrackets + closedBrackets + openCurly + closedCurly + openParen + closedParen;
+    const bracketTotal =
+        openAngle +
+        closedAngle +
+        openBrackets +
+        closedBrackets +
+        openCurly +
+        closedCurly +
+        openParen +
+        closedParen;
     // calculate the inequality of brackets. the lower the number the more unequal
-    const inequality = -Math.abs(openAngle - closedAngle) -
+    const inequality =
+        -Math.abs(openAngle - closedAngle) -
         Math.abs(openBrackets - closedBrackets) -
         Math.abs(openCurly - closedCurly) -
         Math.abs(openParen - closedParen);
@@ -50,40 +90,50 @@ export function isCodeValid(input: string): boolean {
     let symbolsFound = 0;
 
     // test keywords
-    input.split(' ').map(n => n.replace('\n', '')).filter(n => n != '').forEach(word => {
-        if (keywords.includes(word)) {
-            keywordsFound++;
-        }
-    });
-    high_confidence_keywords.forEach(word => {
+    input
+        .split(' ')
+        .map((n) => n.replace('\n', ''))
+        .filter((n) => n != '')
+        .forEach((word) => {
+            if (keywords.includes(word)) {
+                keywordsFound++;
+            }
+        });
+    high_confidence_keywords.forEach((word) => {
         if (input.includes(word)) {
             highKeywordsFound++;
         }
     });
-    low_confidence_keywords.forEach(word => {
+    low_confidence_keywords.forEach((word) => {
         if (input.includes(word)) {
             lowKeywordsFound++;
         }
     });
-    symbol_keywords.forEach(symbol => {
+    symbol_keywords.forEach((symbol) => {
         if (input.includes(symbol)) {
             symbolsFound++;
         }
     });
 
     let confidence = 0;
-    confidence += bracketTotal > 0 ? .5 : -.5;
-    confidence += input.length > 8 ? .5 : -.3;
-    confidence += (inequality < 0 ? inequality / 10 : bracketTotal == 0 ? 0 : .3 * bracketTotal) * (20 / input.length);
-    confidence += semicolons > 0 ? 1 : -.5;
-    confidence += colons > 0 ? .2 : -.2;
-    confidence += keywordsFound * .7;
+    confidence += bracketTotal > 0 ? 0.5 : -0.5;
+    confidence += input.length > 8 ? 0.5 : -0.3;
+    confidence +=
+        (inequality < 0
+            ? inequality / 10
+            : bracketTotal == 0
+            ? 0
+            : 0.3 * bracketTotal) *
+        (20 / input.length);
+    confidence += semicolons > 0 ? 1 : -0.5;
+    confidence += colons > 0 ? 0.2 : -0.2;
+    confidence += keywordsFound * 0.7;
     confidence += 3 * highKeywordsFound;
     confidence += -2 * lowKeywordsFound;
     confidence += symbolsFound;
-    confidence += input.endsWith(';') ? .7 : 0;
-    confidence += quotes > 0 ? .5 : 0;
-    confidence += singleQuotes > 0 ? .5 : 0;
+    confidence += input.endsWith(';') ? 0.7 : 0;
+    confidence += quotes > 0 ? 0.5 : 0;
+    confidence += singleQuotes > 0 ? 0.5 : 0;
 
     return confidence >= 1;
 }

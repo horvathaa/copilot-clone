@@ -1,29 +1,29 @@
-import ExtractorAbstract, { SnippetResult } from "./ExtractorAbstract";
+import ExtractorAbstract, { SnippetResult } from './ExtractorAbstract';
 
-import { parseHTML } from "linkedom";
-import { FetchPageResult } from "../fetchPageContent";
-import { isCodeValid } from "./utils";
+import { parseHTML } from 'linkedom';
+import { FetchPageResult } from '../fetchPageContent';
+import { isCodeValid } from './utils';
 
 export default class ExtractorGithubGist extends ExtractorAbstract {
-
-    name = "Github Gist";
-    URL = "gist.github.com";
+    name = 'Github Gist';
+    URL = 'gist.github.com';
 
     extractSnippets = (options: FetchPageResult): SnippetResult[] => {
         const target = parseHTML(options.textContent);
         const doc = target.window.document;
 
-        const snippet = doc.querySelector("table.highlight")?.textContent;
+        const snippet = doc.querySelector('table.highlight')?.textContent;
 
         if (!snippet || !isCodeValid(snippet)) return [];
 
-        const socialCount = doc.querySelector(".social-count")?.textContent ?? "";
+        const socialCount =
+            doc.querySelector('.social-count')?.textContent ?? '';
 
         const item: SnippetResult = {
             votes: parseInt(socialCount),
             code: cleanContent(snippet),
             sourceURL: options.url,
-            hasCheckMark: false
+            hasCheckMark: false,
         };
 
         return [item];
@@ -46,5 +46,5 @@ function sortSnippetResultFn(a: SnippetResult, b: SnippetResult) {
  * @returns
  */
 function cleanContent(input: string) {
-    return input.replace(/\n {6}\n {8}\n {8}/g, "");
+    return input.replace(/\n {6}\n {8}\n {8}/g, '');
 }
