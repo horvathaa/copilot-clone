@@ -77,7 +77,7 @@ export class ExtractorTerminalLinkProvider implements TerminalLinkProvider {
         for (let i = 1; i <= 10; i++) {
             list.push(i);
         }
-        console.log('context', context);
+        // console.log('context', context);
         const view = window.activeTextEditor?.viewColumn;
         if (view) {
             const startIndex = 0;
